@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		<title> The Graph Machine </title>
+		<meta http-equiv = "content-type" content = "text/html; charset = UTF-8">
+		<link href = "estilos.css" rel = "stylesheet" type = "text/css" media = "screen">
+		<script src="Pagina%20Archivos/jquery.js" async=""></script><script src="Pagina%20Archivos/replace.js" async=""></script>
+		<script src="Pagina%20Archivos/nowait.js" async=""></script><script src="Pagina%20Archivos/analytics.js" async=""></script><script type="text/javascript" src="Prueba1%20Archivos/vis.js"></script>
+		<script src="http://visjs.org/dist/vis.js"></script>
+		<link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+		<script src="components/vis/dist/vis.js"></script>
+		<script src="vis/dist/vis.js"></script>
+		<link href="vis/dist/vis.css" rel="stylesheet" type="text/css" />
+		<link href="components/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+		<link href="Pagina%20Archivos/vis.css" rel="stylesheet" type="text/css">
+<script type = "text/javascript">
+var matriz;
+var Estado;
+var alfabeto;
+var estado_aceptacion;
+var MAXN = 10;
+var n;
+var e;
+var Grafo;
+var Dir;
+var Ciclos;
+var Visitado=new Array(MAXN);
+var AC;
+var CaminosAC;
+function noesAC(x){
+  for (var i=0;i<AC.length;i++){
+    if(AC[i]==x){
+      return false;
+    }
+  }
+  return true;
+}
+
+function dfs(u,cons,x){
+  Visitado[u]=1;
+  for (var i=0;i<Grafo[u].length;i++){
+    var v=Grafo[u][i][0];
+    if(Visitado[v]==0){
+      dfs(v,cons+Grafo[u][i][1],x);
+    } else {
+      if (Visitado[v]==1){
+        if(v==x){
+          Ciclos[x].push(cons+Grafo[u][i][1]);
+        }
+      }
+    }
+  }
+  Visitado[u]=2;
+}
+
+function llenarCiclos(){
+  for (var i=0;i<n;i++){
+    for (var j=0;j<n;j++){
+      Visitado[j]=0;
+    }
+    dfs(i,"",i);
+  }
+}
+
+function completar(st){
+  var ori=st;
+  var pos;
+  for (var i=0;i<Dir.length;i++){
+    if(Dir[i][0]==st){
+      pos=Dir[i][1];
+    }
+  }
+  var ans=st;
+  for (var i=0;i<Ciclos[pos].length;i++){
+    ans+="|[("+Ciclos[pos][i]+")*,"+ori+"]";
+  }
+  return ans;
+}
+
+function caminoER(camino){
+  var ans="";
+  var aux="";
+  for (var i=0;i<camino.length;i++){
+    if(camino[i]==','){
+      ans+="("+completar(aux)+"),";
+      aux="";
+    } else {
+      aux+=(camino[i]).toString();
+    }
+  }
+  ans+="("+completar(aux)+")";
+  return ans;
+}
+
+function ER(){
+  var ans="";
+  for(var i=0;i<CaminosAC.length-1;i++){
+    ans+="["+caminoER(CaminosAC[i])+"] | ";
+  }
+  if(CaminosAC.length){
+    ans+="["+caminoER(CaminosAC[CaminosAC.length-1])+"]";
+  }
+  return ans;
+}
+
+function TablaAutomata()
+{
+  var contenedor = document.getElementById("tabla_automatas");
+  var contenedor_cadena = document.getElementById("expresiones_libres");
+  var filas = document.getElementById('estados').value;
+  n=filas;
+  columnas = document.getElementById('entradas').value;
+  
+  alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var codigo = "<table border = 1><tr> <td rowspan = '2'> </td> <td colspan = '" + columnas + "'><p align = 'center'> Entradas </p></td> </tr>";
+  
+  codigo += "<tr>";
+  
+  for(var i = 0; i < columnas; i++)
+    codigo += "<td><input type = 'text' id = 'e" + i + "' value = '" + i + "' size = '3'></td>";
+  
+  codigo += "</tr>";
+
+  for(var i = 0; i < filas; i++)
+  {
+    codigo += "<tr><td> q" + i + " (" + alfabeto[i] + ") </td>";
+    
+    for(var j = 0; j < columnas; j++)
+      codigo += "<td><input type = 'text' id = 'q" + i + "-" + j + "' size = '3'></td>";
+    
+    codigo += "</tr>";
+  }
+  
+  codigo += "</table><br>";
+  codigo += "Estado de aceptacion: <input type = 'text' style = 'width: 100px;' id = 'estado_aceptacion'><br>";
+  codigo += " * q0 es el estado inicial por defecto. <br>";
+  codigo += "<input type='button' value='Generar Automata de Estados Finitos' onClick='AEF();'>"
+  
+  contenedor.innerHTML = codigo;
+  
+  var codigo_cadena = "";
+  codigo_cadena += "Cadena: <input type = 'text' style = 'width: 175px;' id = 'cadena_entrada'>&nbsp;";
+  codigo_cadena += "<input type = 'button' style = 'background-color: #7da400; color: white;  width: 128px;' value = 'Derivar cadena' onClick = 'ExpresionesLibres();'>";
+  contenedor_cadena.innerHTML = codigo_cadena;
+}
+
+
+function ExpresionesLibres()
+{
+  var contenedor = document.getElementById("mostrar_expresiones_libres");
+  var filas = document.getElementById('estados').value;
+  
+  var id_entrada = ""; var id_celda = "";
+  var dato_entrada; var dato_celda;
+  
+  //CREANDO MATRIZ
+    matriz =  new Array(filas);
+    for(var i = 0; i < filas; i++)
+      matriz[i] = new Array(columnas);
+    
+  //INDICE DE ENTRADAS
+    var indice_entradas = "";
+
+  //AGREGANDO LAS ENTRADAS AL INDICE
+    for(var i = 0; i < columnas; i++)
+    {
+      id_entrada = "e" + i;
+      dato_entrada = document.getElementById(id_entrada).value;
+      
+      indice_entradas += dato_entrada;
+    }
+  
+  //RELLENANDO LA MATRIZ DE ARISTAS
+    for(var i = 0; i < filas; i++)
+    {			
+      for(var j = 0; j < columnas; j++)
+      {				
+        id_celda = "q" + i + "-" + j;
+        dato_celda = document.getElementById(id_celda).value;
+        
+        matriz[i][j] = dato_celda;
+      }
+    }
+  
+  //DERIVANDO LA CADENA
+    var codigo = "A <br>";
+  
+    estado_aceptacion = document.getElementById("estado_aceptacion").value;
+    var cadena = document.getElementById("cadena_entrada").value;
+    var cadena_derivada = "A";
+    
+    for(var i = 0; i < cadena.length; i++)
+    {	
+      var entrada_actual = indice_entradas.indexOf(cadena[i]);
+      var estado_actual = alfabeto.indexOf(cadena_derivada[cadena_derivada.length - 1]);
+      
+      cadena_derivada = cadena_derivada.substring(0, cadena_derivada.length - 1); //ELIMINANDO EL ULTIMO CARACTER
+      cadena_derivada += cadena[i] + matriz[estado_actual][entrada_actual];
+      
+      codigo += cadena_derivada;
+      codigo += "<br>";
+    }
+    
+    //VERIFICANDO SI SE LLEGO AL ESTADO DE ACEPTACION
+      if(cadena_derivada[cadena_derivada.length - 1] == estado_aceptacion)
+        codigo += cadena + "<br><br> Verdadero.";
+        
+      else codigo += "<br> Falso.";
+    
+  contenedor.innerHTML = codigo;
+}
+
+function main(){
+  AC=new Array(0);
+  CaminosAC=new Array(0);
+  e=columnas*n;
+  Grafo =new Array(n);
+  Ciclos =new Array(n);
+  var A=new Array(n);
+  Dir=new Array(e);
+  Estado=new Array(e);
+  for (var i=0;i<n;i++){
+    Grafo[i]=new Array(0);
+    Ciclos[i]=new Array(0);
+    A[i]=new Array(n);
+    for (j=0;j<n;j++){
+      A[i][j]=new Array(2);
+      A[i][j][0]=0;
+      A[i][j][1]=new Array();
+    }
+  }
+  for (var i=0;i<n;i++){
+    for (var j=0;j<columnas;j++){
+      var a=i;
+      var b=alfabeto.indexOf(matriz[i][j]);
+      var peso=(i*columnas+j).toString();
+      Dir[i*columnas+j]=[peso,a];
+      Grafo[a].push([b,peso]);
+      A[a][b][0]=1;
+      A[a][b][1].push(peso);
+    }
+  }
+  llenarCiclos();
+  var nAC=estado_aceptacion.length;
+  for (var i=0;i<nAC;i++){
+    var aux=alfabeto.indexOf(estado_aceptacion[i]);
+    AC.push(aux);
+  }
+  for (var i=1;i<n;i++){
+    if(noesAC(i)){
+      var Ad=new Array(0);
+      var In=new Array(0);
+      for(var j=0;j<n;j++){
+        if(A[j][i][0]){
+          In.push(j);
+        }
+        if(A[i][j][0]){
+          Ad.push(j);
+        }
+      }
+      for (var j=0;j<In.length;j++){
+        for (var k=0;k<Ad.length;k++){
+          var fi=A[In[j]][i][1].length;
+          var fa=A[i][Ad[k]][1].length;
+          for (var ii=0;ii<fi;ii++){
+            for (var jj=0;jj<fa;jj++){
+              A[In[j]][Ad[k]][0]=1;
+              A[In[j]][Ad[k]][1].push(A[In[j]][i][1][ii]+","+A[i][Ad[k]][1][jj]);
+            }
+          }
+        }
+      }
+    }
+  }
+  for (var i=0;i<n;i++){
+    if(noesAC(i)==false){
+      if(A[0][i][0]){
+        for (var j=0;j<A[0][i][1].length;j++){
+          CaminosAC.push(A[0][i][1][j]);
+        }
+      }
+    }
+  }
+  var Expresion_Regular=ER();
+  var ans="";
+  var aux="";
+  var nonumbers="0123456789";
+  for (var i=0;i<Expresion_Regular.length;i++){
+    var esnumber=false;
+    for (var j=0;j<nonumbers.length;j++){
+      if(Expresion_Regular[i]==nonumbers[j]){
+        esnumber=true;
+      }
+    }
+    if(esnumber==false ){
+      if (aux!=""){
+        var numerito=parseInt(Number(aux)%columnas);
+        ans+=numerito.toString();
+      } 
+      ans+=Expresion_Regular[i];
+      aux="";
+    } else {
+      aux+=Expresion_Regular[i];
+    }
+  }
+  console.log(ans);
+  document.getElementById("ExRe").innerHTML = ans;
+}
+
+</script>
+
+
+    <script type="text/javascript">
+        var nodes, edges, network;
+        var nodes2, edges2, network2;
+
+        // convenience method to stringify a JSON object
+        function toJSON(obj) {
+            return JSON.stringify(obj, null, 4);
+        }
+
+        function addNode(cod,lab) {
+            try {
+                nodes.add({
+                    id: cod, //document.getElementById('node-id').value,
+                    label: lab //document.getElementById(lab).value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function addEdge2(cod, f, t, lab) {
+			var alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            try {
+                edges.add({
+                    id: cod, //document.getElementById('edge-id').value,
+                    from: f, //document.getElementById(f).value,//document.getElementById('edge-from').value,
+                    to: alfabeto.indexOf(document.getElementById(t).value),//document.getElementById('edge-to').value,
+                    label: document.getElementById(lab).value//document.getElementById('edge-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function addNode2() {
+            try {
+                nodes.add({
+                    id: document.getElementById('node-id').value,
+                    label: document.getElementById('node-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        function updateNode() {
+            try {
+                nodes.update({
+                    id: document.getElementById('node-id').value,
+                    label: document.getElementById('node-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function removeNode() {
+            try {
+                nodes.remove({id: document.getElementById('node-id').value});
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+		
+        function addEdge() {
+            try {
+                edges.add({
+                    id: document.getElementById('edge-id').value,
+                    from: document.getElementById('edge-from').value,
+                    to: document.getElementById('edge-to').value,
+                    label: document.getElementById('edge-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function updateEdge() {
+            try {
+                edges.update({
+                    id: document.getElementById('edge-id').value,
+                    from: document.getElementById('edge-from').value,
+                    to: document.getElementById('edge-to').value,
+                    label: document.getElementById('edge-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function removeEdge() {
+            try {
+                edges.remove({id: document.getElementById('edge-id').value});
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+//-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+		function addNodeF(cod,lab,str) {
+			
+            try {
+                nodes2.add({
+                    id: cod, //document.getElementById('node-id').value,
+                    label: document.getElementById(lab).value+'/'+str
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function addEdgeF2(cod, f, t, lab) {
+            try {
+                edges2.add({
+                    id: cod,//document.getElementById('edge-id').value,
+                    from: document.getElementById(f).value,//document.getElementById('edge-from').value,
+                    to: document.getElementById(t).value,//document.getElementById('edge-to').value,
+                    label: document.getElementById(lab).value //+'/'+ document.getElementById(lab).value//document.getElementById('edge-label').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function addNodeF2() {
+            try {
+                nodes2.add({
+                    id: document.getElementById('node-id2').value,
+                    label: document.getElementById('node-label2').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        function updateNodeF() {
+            try {
+                nodes2.update({
+                    id: document.getElementById('node-id2').value,
+                    label: document.getElementById('node-label2').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function removeNodeF() {
+            try {
+                nodes2.remove({id: document.getElementById('node-id2').value});
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+		
+        function addEdgeF() {
+            try {
+                edges2.add({
+                    id: document.getElementById('edge-id2').value,
+                    from: document.getElementById('edge-from2').value,
+                    to: document.getElementById('edge-to2').value,
+                    label: document.getElementById('edge-label2').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function updateEdgeF() {
+            try {
+                edges2.update({
+                    id: document.getElementById('edge-id2').value,
+                    from: document.getElementById('edge-from2').value,
+                    to: document.getElementById('edge-to2').value,
+                    label: document.getElementById('edge-label2').value
+                });
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+        function removeEdgeF() {
+            try {
+                edges2.remove({id: document.getElementById('edge-id2').value});
+            }
+            catch (err) {
+                alert(err);
+            }
+        }
+ 
+//----------------------DRAW-------------------- 
+        function draw() {
+            // create an array with nodes
+            nodes = new vis.DataSet();
+            nodes.on('*', function () {
+                document.getElementById('nodes').innerHTML = JSON.stringify(nodes.get(), null, 4);
+            });
+            nodes.add([
+                
+            ]);
+
+            // create an array with edges
+            edges = new vis.DataSet();
+            edges.on('*', function () {
+                document.getElementById('edges').innerHTML = JSON.stringify(edges.get(), null, 4);
+            });
+            edges.add([
+                
+            ]);
+
+            // create a network
+            var container = document.getElementById('network');
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+            var options = {
+				nodes:{
+					borderWidth: 3,
+					color: '#edd9af',
+					fixed: false,
+			
+					scaling: {
+					label: true
+					},
+					shadow: true,
+					shape: 'circle'
+					},
+						
+				edges:{
+					arrows:{
+						//to: {enabled:true , sacalefactor: 1},
+						from: {enabled: true, scaleFactor:0.5}
+					},
+					length: 150,
+				}
+			};
+				
+				
+			nodes2 = new vis.DataSet();
+            nodes2.on('*', function () {
+                document.getElementById('nodes2').innerHTML = JSON.stringify(nodes.get(), null, 4);
+            });
+            nodes.add([
+                
+            ]);
+
+            // create an array with edges
+            edges2 = new vis.DataSet();
+            edges2.on('*', function () {
+                document.getElementById('edges2').innerHTML = JSON.stringify(edges.get(), null, 4);
+            });
+            edges2.add([
+                
+            ]);
+
+            // create a network
+            var container2 = document.getElementById('network2');
+            var data2 = {
+                nodes: nodes2,
+                edges: edges2
+            };
+            
+            network = new vis.Network(container, data, options);
+            network2 = new vis.Network(container2, data2, options); 
+
+        }
+
+    
+
+function createTable(){
+
+    var table = document.getElementById("tabla_con_salidas");
+    var col = document.getElementById('estados').value;
+    var fil = document.getElementById('entradas').value;
+    var str = "<table border='1'><tr><td rowspan='2'>#</td><td colspan='"+col+"'><p align='center'>Conexiones</p></td><td colspan='"+col+"'><p  align='center'>Salidas</p></td>";
+
+    str += "<tr>"
+	for (var i = 0; i < col; i++){
+		str += "<td><input type='text' id='conex"+i+"' value ='"+i+"' size='7'> </td>";
+    }
+    for (var i = 0; i < col; i++){
+		str += "<td><input type='text' id='sal"+i+"' value ='"+i+"' size='7'> </td>";
+    }
+
+    str += "</tr>";
+
+    for (var i = 0; i < fil; i++){
+    	str += "<tr><td><input type='text' id='estad"+i+"' value='"+i+"' size='5'> </td>";
+	    for (var j = 0; j < col; j++) {
+	    	str += "<td><input type='text' id='"+i+"-"+(j+1)+"' size='7'></td>";
+	    }
+	    for (var j = 0; j < col; j++) {
+	    	str += "<td><input type='text' id='a"+i+"-"+(j+1)+"' size='7'></td>";
+	    }
+	    str += "</tr>";
+	}
+    str += "</table>"; 
+    //str += "<input type='button' onClick='javascript:obtainDATA();' value='Generar Grafica'>";
+    
+    table.innerHTML = str;   
+}
+
+function obtainDATA(){
+	var col = document.getElementById('estados').value;
+	var fil = document.getElementById('entradas').value;
+    var grafica = document.getElementById("grafica");
+	var matriz =  new Array(fil);
+	var matriz_sal = new Array(fil); 
+	var entradas = new Array(col);
+	var data, value_, str;
+
+	str = "";
+
+	str += "Entradas :[ ";
+	for (var i = 0; i < col; i++){
+		value_ = "E"+ i;
+		data = document.getElementById(value_).value;
+		entradas[i] = data;
+		str += entradas[i] + " ";
+	}
+	str += "]<br><br>Valores de la Matriz: <br><br>";
+
+	str += "<table border='1' ><tr><td>Entradas</td><td>Salidas</td></tr><tr><td>";
+
+	for (var i = 0; i < fil; i++){
+		matriz[i] = new Array(col);
+	}
+
+	for (var i = 0; i < fil; i++){
+		for (var j = 0; j < col; j++){
+			value_ = i+"-"+(j+1);
+			data = document.getElementById(value_).value;
+			matriz[i][j] = data;
+		}
+	}
+	
+	for (var i = 0; i < fil; i++){
+		for (var j = 0; j < col; j++){
+			str += matriz[i][j] + " | "; 
+		}
+		str += "<br> "; 
+	}
+
+	str += "</td><td>";
+
+	for (var i = 0; i < fil; i++){
+		matriz_sal[i] = new Array(col);
+	}
+
+	for (var i = 0; i < fil; i++){
+		for (var j = 0; j < col; j++){
+			value_ ="O-"+ i+"-"+(j+1);
+			data = document.getElementById(value_).value;
+			matriz_sal[i][j] = data;
+		}
+	}
+	
+	for (var i = 0; i < fil; i++){
+		for (var j = 0; j < col; j++){
+			str += matriz_sal[i][j] + " | "; 
+		}
+		str += "<br> "; 
+	}
+
+	grafica.innerHTML = str;
+
+}
+
+function AEF() {
+	var col = document.getElementById('estados').value;
+	var fil = document.getElementById('entradas').value;
+	var alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	for (var i = 0; i < fil; i++){
+		addNode(i, alfabeto[i]);
+	}
+	cont=0;
+	for (var i = 0; i < col; i++)
+	{
+		for (var j = 0; j < fil; j++)
+		{
+			addEdge2(cont, i,'q'+i+'-'+j,'e'+j)
+			cont++;
+		}
+	}
+}
+
+function Moore() {
+	var col = document.getElementById('estados').value;
+	var fil = document.getElementById('entradas').value;
+	
+	
+	for (var i = 0; i < fil; i++)
+	{
+		var str="";
+		
+		for (var j = 0; j < col; j++)
+		{
+			str += document.getElementById('a'+i+'-'+(j+1)).value + ',';
+		}
+		
+		addNodeF(i,'estad'+i,str);
+		str="";
+	}
+	cont=0;
+	for (var i = 0; i < col; i++)
+	{
+		for (var j = 0; j < fil; j++)
+		{
+			addEdgeF2(cont,'estad'+i,i+'-'+(j+1),'conex'+j)
+			cont++;
+		}
+	}
+}
+
+
+</script>
+<script src="Prueba1%20Archivos/googleAnalytics.js"></script>
+</head>
+
+<body onload="draw();">
+	
+
+		<div id = "color_fondo"> </div>
+		<div id = "banner_principal"> </div>
+		<div id = "banner_izquierda"> <img src = "imagenes/logo.png"> </div>
+		<div id = "ayuda"> </div>
+		<div id = "guion"> </div>
+		
+		<div id = "banner_tabla"> </div>
+		<div id = "contenedor_tabla"> </div>
+		
+
+		
+		<div id = "entradas_tabla">
+			Numero de entradas: <input type = "text" style = "width: 133px;" id = "entradas">
+			<input type = "button" style = "background-color: #7da400; color: white; width: 128px;" value = "Crear tabla" onClick = "TablaAutomata();createTable()";><br>
+			Numero de estados: <input type = "text" id = "estados">
+		</div>
+		
+		<div id = "tabla_automatas"></div>
+		<div id = "expresiones_libres"></div>
+		<div id = "mostrar_expresiones_libres"></div>
+		
+		
+		
+		
+		<div id = "contenedor_grafos">
+			<h1>Adjustes</h1>
+<table>
+    <tbody><tr>
+        <td>
+            <h2>Nodos</h2>
+            <table>
+                <tbody><tr>
+                    <td></td>
+                    <td><label for="node-id">Id</label></td>
+                    <td><input id="node-id" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="node-label">Label</label></td>
+                    <td><input id="node-label" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="node-add" onclick="addNode2();">Add</button>
+                        <button id="node-update" onclick="updateNode();">Update</button>
+                        <button id="node-remove" onclick="removeNode();">Remove</button>
+                    </td>
+                </tr>
+            </tbody></table>
+        </td>
+        <td>
+            <h2>Enlaces</h2>
+            <table>
+                <tbody><tr>
+                    <td></td>
+                    <td><label for="edge-id">Id</label></td>
+                    <td><input id="edge-id" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="edge-from">From</label></td>
+                    <td><input id="edge-from" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="edge-to">To</label></td>
+                    <td><input id="edge-to" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="edge-label">Label</label></td>
+                    <td><input id="edge-label" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="edge-add" onclick="addEdge();">Add</button>
+                        <button id="edge-update" onclick="updateEdge();">Update</button>
+                        <button id="edge-remove" onclick="removeEdge();">Remove</button>
+                    </td>
+                </tr>
+            </tbody></table>
+        </td>
+    </tr>
+
+</tbody></table>
+			<table class="view">
+				<colgroup>
+				<col width="8%">
+				<col width="8%">
+				<col width="18%">
+			</colgroup>
+			<tbody><tr>
+				<td>
+					<h2>Nodes</h2>
+					<pre id="nodes">[]</pre>
+				</td>
+
+				<td>
+					<h2>Edges</h2>
+					<pre id="edges">[]</pre>
+				</td>
+				<td>
+				<h2>Automata de Estados Finitos</h2>
+
+					<div id="network"><div tabindex="900"  class="vis-network">
+						</div></div>
+				</td>
+				</tr>
+			</tbody></table>
+		</div>
+	
+	<div id = "contenedor_salidas">
+			<div id="tabla_con_salidas"></div>
+			<input type="button" value="Generar Maquina de Mooree" onClick="Moore();"><br>
+			
+		</div>
+	<div id = "contenedor_grafos_moore">
+		<h1>Maquina de Moore</h1>
+<br>
+<h1>Adjustes</h1>
+<table>
+    <tbody><tr>
+        <td>
+            <h2>Nodos</h2>
+            <table>
+                <tbody><tr>
+                    <td></td>
+                    <td><label for="node-id2">Id</label></td>
+                    <td><input id="node-id2" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="node-label2">Label</label></td>
+                    <td><input id="node-label2" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="node-add2" onclick="addNodeF2();">Add</button>
+                        <button id="node-update2" onclick="updateNodeF();">Update</button>
+                        <button id="node-remove2" onclick="removeNodeF();">Remove</button>
+                    </td>
+                </tr>
+            </tbody></table>
+        </td>
+        <td>
+            <h2>Enlaces</h2>
+            <table>
+                <tbody><tr>
+                    <td></td>
+                    <td><label for="edge-id2">Id</label></td>
+                    <td><input id="edge-id2" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="edge-from2">From</label></td>
+                    <td><input id="edge-from2" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="edge-to2">To</label></td>
+                    <td><input id="edge-to2" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="edge-label2">Label</label></td>
+                    <td><input id="edge-label2" type="text"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Action</td>
+                    <td>
+                        <button id="edge-add2" onclick="addEdgeF();">Add</button>
+                        <button id="edge-update2" onclick="updateEdgeF();">Update</button>
+                        <button id="edge-remove2" onclick="removeEdgeF();">Remove</button>
+                    </td>
+                </tr>
+            </tbody></table>
+        </td>
+    </tr>
+
+</tbody></table>
+<div id="hola">
+		<table class="view">
+    <colgroup>
+        <col width="25%">
+        <col width="25%">
+        <col width="50%">
+    </colgroup>
+    <tbody><tr>
+        <td>
+            <h2>Nodes</h2>
+            <pre id="nodes2">[]</pre>
+        </td>
+
+        <td>
+            <h2>Edges</h2>
+            <pre id="edges2">[]</pre>
+        </td>
+
+        <td>
+            <h2>Automata de Estados Finitos</h2>
+
+            <div id="network2"><div tabindex="900" style="position: relative; overflow: hidden; width: 100%; height: 100%;" class="vis-network"><canvas height="400" width="641" style="position: relative; width: 100%; height: 100%;"></canvas></div></div>
+		</td>
+    </tr>
+</tbody></table>
+	
+	
+	</div>
+	</div>
+	<!-------------------AQUI COMIENZA EL DIV---------------------------------------------->
+	<div id="demo">
+    <button type="button" onclick="main()"> ExpresionRegular</button>
+    <p id="ExRe"></p>
+	</div><!-----------------AQUI ACABA EL DIV------------------------------------------------>
+			
+	<script id="sb-script" src="Prueba1%20Archivos/core.js"></script>
+</html>
