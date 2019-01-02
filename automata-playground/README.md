@@ -1,1 +1,2 @@
-# Teoría-de-la-Computación
+# Teoría de la Computación
+- Autómatas
