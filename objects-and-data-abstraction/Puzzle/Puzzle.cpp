@@ -132,7 +132,7 @@ bool Puzzle:: win_lose(){
      }
   }
 
-  if ( cont == 15 )
+  if ( cont == 16 )  // all 16 cells, the gap included
     return true;
   return false;
 
