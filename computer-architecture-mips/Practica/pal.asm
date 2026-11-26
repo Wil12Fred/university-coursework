@@ -11,7 +11,7 @@ main:		# execution starts here
   move $t2,$a0
   syscall
 
-	li $t1,-1		# contador del tamaño del string
+	li $t1,-1		# contador del tamano del string
 nextCh:
 	lb $t0,($t2)	# leyendo un byte del string
 	beqz $t0,strEnd	# mientras no encuentro
