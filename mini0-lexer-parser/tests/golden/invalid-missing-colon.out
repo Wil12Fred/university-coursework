@@ -1,0 +1,10 @@
+('x', 'IDENTIFIER')
+('int', 'DATATYPE')
+('\n', 'ENDLINE')
+('', 'ENDFILE')
+
+ ERROR:
+error en token:
+('int', 'DATATYPE')
+
+{0: 'IDENTIFIER', -1: 'gl'}

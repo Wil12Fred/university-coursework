@@ -1,0 +1,5 @@
+x : int
+v : [] char
+// comment
+fun f() : bool
+end

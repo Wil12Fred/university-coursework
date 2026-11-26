@@ -1,0 +1,12 @@
+('x', 'IDENTIFIER')
+(':', 'DOSPUNTOS')
+('int', 'DATATYPE')
+('\n', 'ENDLINE')
+('y', 'IDENTIFIER')
+(':', 'DOSPUNTOS')
+('bool', 'DATATYPE')
+('\n', 'ENDLINE')
+('', 'ENDFILE')
+
+ Analisis sintactico correcto
+{0: 'IDENTIFIER', -1: 'decls', 1: 'DOSPUNTOS', 2: 'DATATYPE', 3: 'decls', 4: 'IDENTIFIER', 5: 'DOSPUNTOS', 6: 'DATATYPE', 7: 'ENDLINE', 8: 'ENDFILE'}

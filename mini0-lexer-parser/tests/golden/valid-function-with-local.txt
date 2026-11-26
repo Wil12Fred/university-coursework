@@ -1,0 +1,4 @@
+x : int
+fun f() : int
+r : int
+end

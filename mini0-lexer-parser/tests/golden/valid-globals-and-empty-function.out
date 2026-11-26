@@ -1,0 +1,23 @@
+('x', 'IDENTIFIER')
+(':', 'DOSPUNTOS')
+('int', 'DATATYPE')
+('\n', 'ENDLINE')
+('v', 'IDENTIFIER')
+(':', 'DOSPUNTOS')
+('[', 'OP_BRA')
+(']', 'CL_BRA')
+('char', 'DATATYPE')
+('\n', 'ENDLINE')
+('fun', 'FUNCTION')
+('f', 'IDENTIFIER')
+('(', 'OP_PAR')
+(')', 'CL_PAR')
+(':', 'DOSPUNTOS')
+('bool', 'DATATYPE')
+('\n', 'ENDLINE')
+('end', 'END')
+('\n', 'ENDLINE')
+('', 'ENDFILE')
+
+ Analisis sintactico correcto
+{0: 'IDENTIFIER', -1: 'decls', 1: 'DOSPUNTOS', 2: 'DATATYPE', 3: 'decls', 4: 'IDENTIFIER', 5: 'tipo', 6: 'OP_BRA', 7: 'CL_BRA', 8: 'DATATYPE', 9: 'decls', 10: 'FUNCTION', 11: 'params2', 12: 'OP_PAR', 13: 'CL_PAR', 14: 'DOSPUNTOS', 15: 'DATATYPE', 16: 'ENDLINE', 17: 'END', 18: 'ENDLINE', 19: 'ENDFILE'}

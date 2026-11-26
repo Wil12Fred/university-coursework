@@ -1,0 +1,12 @@
+[project]
+name = "mini0-lexer-parser"
+version = "0.1.0"
+description = "Lexer and naive top-down parser for a toy Mini-0 language"
+requires-python = ">=3.9"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

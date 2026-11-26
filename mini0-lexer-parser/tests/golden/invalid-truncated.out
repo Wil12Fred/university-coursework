@@ -1,0 +1,17 @@
+('x', 'IDENTIFIER')
+(':', 'DOSPUNTOS')
+('int', 'DATATYPE')
+('\n', 'ENDLINE')
+('fun', 'FUNCTION')
+('f', 'IDENTIFIER')
+('(', 'OP_PAR')
+(')', 'CL_PAR')
+('int', 'DATATYPE')
+('\n', 'ENDLINE')
+('', 'ENDFILE')
+
+ ERROR:
+error en token:
+('int', 'DATATYPE')
+
+{0: 'IDENTIFIER', -1: 'decls', 1: 'DOSPUNTOS', 2: 'DATATYPE', 3: 'ENDLINE', 4: 'FUNCTION', 5: 'params2', 6: 'OP_PAR', 7: 'CL_PAR'}
