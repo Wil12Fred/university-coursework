@@ -38,12 +38,14 @@ pal:
   beq $t3,$t1,L2
   lb $t6,($t4)
   lb $t7,($t5)
-  add $t4,1
-  sub $t5,1
+  sub $t4,1   # t4 walks left from the middle
+  add $t5,1   # t5 walks right from the middle
   add $t3,$t3,1
   beq $t6,$t7,pal
+  j NOPAL     # a pair differed, even if it was the last one
 L2:
   beq $t3,$t1,L3
+NOPAL:
   la $a0,noespalindromo
   li $v0,4
   syscall
