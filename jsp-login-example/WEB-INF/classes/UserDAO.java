@@ -11,23 +11,21 @@ public class UserDAO {
 
    public static UserBean login(UserBean bean) {
 
-      Statement stmt = null;    
+      PreparedStatement stmt = null;
 
-      String username = bean.getUsername();    
-      String password = bean.getPassword();   
-   
-      String searchQuery =
-            "select *from users where username='"+ username
-                     + "' and password='"
-                     + password
-                     + "'";
-   
-   System.out.println("Query: "+searchQuery);
-   
+      String username = bean.getUsername();
+      String password = bean.getPassword();
+
+      // Placeholders, not string concatenation: the credentials are sent as
+      // data and can never change the query (SQL injection).
+      String searchQuery = "select * from users where username=? and password=?";
+
    try {
       currentCon = ConnectionManager.getConnection();
-      stmt=currentCon.createStatement();
-      rs = stmt.executeQuery(searchQuery);         
+      stmt = currentCon.prepareStatement(searchQuery);
+      stmt.setString(1, username);
+      stmt.setString(2, password);
+      rs = stmt.executeQuery();
       boolean more = rs.next();
       
       if (!more) {
