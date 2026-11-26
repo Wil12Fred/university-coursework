@@ -36,12 +36,13 @@ nodoAVL<T>* removing(nodoAVL<T>* n, int dato){
     if( !n ) 
       return 0;
     if(n->dato==dato){
-      nodoAVL<T>* pp=n;//duplico
-      delete n;
-      if( !pp->nodo[1] ) return pp->nodo[0];
-      nodoAVL<T>* aux = fmin(pp->nodo[1]);//aux
-      aux->nodo[1] = rmin(pp->nodo[1]);
-      aux->nodo[0] = pp->nodo[0];
+      nodoAVL<T>* izq=n->nodo[0];
+      nodoAVL<T>* der=n->nodo[1];
+      delete n;  // read the children first: n was used after delete
+      if( !der ) return izq;
+      nodoAVL<T>* aux = fmin(der);//aux
+      aux->nodo[1] = rmin(der);
+      aux->nodo[0] = izq;
       return balancear(aux);
     }
     bool aux=!(dato<n->dato);
@@ -78,7 +79,7 @@ int main (){
   while (1){
     int decision;
     cout << "insert-remove" << endl;
-    cin >> decision;
+    if (!(cin >> decision)) break;  // stop at end of input
     if (decision==1){
       int n;
       cin >> n;
