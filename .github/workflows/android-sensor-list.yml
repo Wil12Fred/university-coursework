@@ -24,4 +24,4 @@ jobs:
           distribution: temurin
           java-version: '8'
       - name: Build and unit-test
-        run: sh ./gradlew --no-daemon assembleDebug testDebugUnitTest
+        run: bash ./gradlew --no-daemon assembleDebug testDebugUnitTest
