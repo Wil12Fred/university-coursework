@@ -9,3 +9,8 @@ build/
 *.iml
 .vscode/
 .DS_Store
+
+# Maven
+target/
+.mvn-home/
+.m2repo/
