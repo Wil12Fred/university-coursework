@@ -61,7 +61,7 @@ void Draw_Meridian(float *At) {
 }
 
 void Draw_Vector(float *At, float *Direction) {
-    int ierr;
+    int ierr = 0;  // VectorNormalize does nothing if ierr is already set
     float mod;
     float alpha, beta;
     float length = .2f;

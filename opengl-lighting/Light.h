@@ -184,7 +184,7 @@ void Light::Rotar_Luces_Latitud(float inc) {
 }
 
 void Light::Acercar_Alejar_Luces(float step) {
-    int ierr;
+    int ierr = 0;  // VectorNormalize does nothing if ierr is already set
     float vaX, vaY, vaZ;
     float modulo;
     vaX = this->position[0];
