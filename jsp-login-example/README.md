@@ -1,6 +1,6 @@
 # LoginPageJsp
 
-A minimal Java web application from a university course (2018): a JSP login form
+A minimal Java web application from university coursework (first committed in 2016): a JSP login form
 that sends the username and password to a servlet, which looks the user up in a
 MySQL table and shows a welcome page or an "invalid user" page. The UI text is in
 Spanish.
