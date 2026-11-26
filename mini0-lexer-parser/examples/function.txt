@@ -1,0 +1,6 @@
+x : int
+fun suma(a : int) : int
+r : int
+r = a + a
+return r
+end
