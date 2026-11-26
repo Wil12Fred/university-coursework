@@ -218,8 +218,8 @@ def syn(tokens):
 				#print (':')
 				#print (sL)
 					
-                        #top[3] = i
-                        sL.append (top)
+			#top[3] = i
+			sL.append (top)
 			finalStruct[top[3]] = top[0]
 			sL = addToNextEnd(sL, i)
 			i = i + 1
