@@ -1,6 +1,6 @@
 # Teoría de la Computación — "The Graph Machine"
 
-A static web page for a Theory of Computation course (UCSP). You describe a
+A static web page for a university Theory of Computation course. You describe a
 finite automaton as a transition table and the page:
 
 - derives an input string step by step and says whether it is accepted
