@@ -62,7 +62,15 @@ class RBTree{
 
 	RBNode *root;
 	RBNode *nil;
-	
+
+	// The destructor relies on a sentinel; without it an empty tree crashed.
+	RBTree(){
+		nil = new RBNode();
+		nil->parent = nil->left = nil->right = nil;
+		nil->color = BLACK;
+		root = nil;
+	}
+
 	virtual ~RBTree();
 
 	bool checkTree();
