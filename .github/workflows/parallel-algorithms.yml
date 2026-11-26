@@ -14,10 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y openmpi-bin libopenmpi-dev
       - run: make -j4
-      - name: smoke-run
-        run: |
-          build/pth_pi_mutex 4 10000000
-          build/pth_pi_busy2 4 10000000
-          build/pth_mat_vect_rand_split 4 500 500
-          printf '1000\n10000\n0.8\n0.1\n' | build/pth_ll_rwl 4
+      - name: Pthreads tests
+        run: make test
+      - name: Build the MPI programs
+        run: make mpi build/oddeven_test
+      - name: MPI tests (mpirun --oversubscribe)
+        run: make test-mpi
