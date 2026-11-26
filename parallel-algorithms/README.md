@@ -1,9 +1,14 @@
-# Algoritmos Paralelos
+# parallel-algorithms
 
-Exercises from the *Parallel Algorithms* course (UCSP, 2018): cache-aware matrix
-multiplication, Pthreads (chapter 4 of P. Pacheco, *An Introduction to Parallel
-Programming*), and two MPI programs. `PThreads/tarea.pdf` is the write-up
-(in Spanish) reproducing the book's tables 4.1 and 4.3–4.5.
+[![CI](https://github.com/Wil12Fred/university-coursework/actions/workflows/parallel-algorithms.yml/badge.svg)](https://github.com/Wil12Fred/university-coursework/actions/workflows/parallel-algorithms.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
+
+Exercises from a parallel algorithms course: cache-aware matrix
+multiplication, Pthreads programs from chapter 4 of P. Pacheco, *An
+Introduction to Parallel Programming* (critical sections, three ways to lock a
+shared linked list), and two MPI programs. `PThreads/tarea.pdf` is the
+write-up (in Spanish) reproducing the book's tables 4.1 and 4.3–4.5.
+
+## Features
 
 | Program | Source | What it does |
 |---|---|---|
@@ -11,31 +16,37 @@ Programming*), and two MPI programs. `PThreads/tarea.pdf` is the write-up
 | `pth_pi_busy2`, `pth_pi_mutex` | `PThreads/` | Estimate pi with threads; critical section by busy-waiting vs. a mutex |
 | `pth_ll_one_mut`, `pth_ll_mult_mut`, `pth_ll_rwl` | `PThreads/` | Shared sorted linked list: one mutex for the list, one mutex per node, a read-write lock |
 | `pth_mat_vect_rand_split` | `PThreads/` | Matrix-vector product with a random matrix split across threads |
-| `oddevensort`, `mulmatrizvector` | `*.c` (MPI) | Odd-even transposition sort; matrix-vector product with `MPI_Scatter`/`MPI_Allgather` |
+| `oddevensort` | `oddevensort.c` (MPI) | Odd-even transposition sort of 500 values per process |
+| `mulmatrizvector` | `mulmatrizvector.c` (MPI) | 100x100 matrix-vector product with `MPI_Scatter`/`MPI_Allgather`; reads A and x from stdin |
 
 `PThreads/timer.h`, `PThreads/my_rand.h` and `PThreads/my_rand.c` are the
 book's helper files, which were never committed; they are small compatible
 re-implementations so the programs build.
 
+## Requirements
+
+- Debian/Ubuntu: `sudo apt install gcc g++ make` and, for the MPI programs,
+  `openmpi-bin libopenmpi-dev`; `python3` for the MPI tests
+- Arch: `sudo pacman -S gcc make` and `openmpi`; `python`
+
 ## Build
 
 ```bash
-make          # cache_matmul + all Pthreads programs into build/  (gcc, g++)
-make mpi      # the MPI programs; needs mpicc (e.g. apt install libopenmpi-dev)
+make          # cache_matmul + all Pthreads programs into build/
+make mpi      # the MPI programs (mpicc)
 ```
 
-**The MPI programs were not built or run**: no MPI implementation was available
-when this README was written.
+## Run
 
-## Run (real output)
+Real output (timings depend on the machine):
 
-```bash
+```console
 $ build/pth_pi_busy2 4 100000000          # <threads> <terms>
 With n = 100000000 terms,
    Multi-threaded estimate of pi  = 3.141592643589817
-   Elapsed time = 3.895998e-02 seconds
+   Elapsed time = 3.839278e-02 seconds
    Single-threaded estimate of pi = 3.141592643589326
-   Elapsed time = 9.439301e-02 seconds
+   Elapsed time = 9.599495e-02 seconds
    Math library estimate of pi    = 3.141592653589793
 
 # <threads>; then: keys to insert, total ops, search fraction, insert fraction
@@ -47,12 +58,62 @@ Total ops = 100000
 member ops = 80016
 insert ops = 9952
 delete ops = 10032
-
-$ build/pth_mat_vect_rand_split 4 1000 1000   # <threads> <rows> <cols>
-$ build/cache_matmul                          # 11 timings, ~2 s total
-
-# MPI (unverified)
-mpiexec -n 4 build/oddevensort
 ```
 
-Timings depend on the machine.
+```bash
+build/pth_mat_vect_rand_split 4 1000 1000   # <threads> <rows> <cols>
+build/cache_matmul                          # 11 timings, ~2 s total
+mpirun -np 4 build/oddevensort              # one "Elapsed time" line per process
+python3 tests/matvec_case.py | mpirun -np 4 build/mulmatrizvector
+```
+
+## Tests
+
+```bash
+make test        # Pthreads
+make test-mpi    # MPI; needs Open MPI (uses mpirun --oversubscribe)
+```
+
+- `tests/list_test.c`, built once per list variant with AddressSanitizer:
+  insert/member/delete semantics (duplicates rejected, head and tail deletes,
+  sorted order), then four threads inserting and deleting interleaved keys
+  under the program's own locking scheme; the list must end sorted and hold
+  exactly the expected keys. Removing a lock makes it fail.
+- `tests/run_tests.sh`: both pi programs (3 threads, so the slices start on
+  odd and even terms) are within 1e-6 of pi and the threaded sum equals the
+  serial one; each list program counts every requested operation exactly once.
+- `tests/oddeven_test.c` (1, 2 and 4 processes): the sort loses or
+  duplicates no value, and every value on rank r is ≤ every value on rank r+1.
+- `mulmatrizvector` on 1, 2 and 4 processes must print exactly y = A·x for
+  the integer A and x generated by `tests/matvec_case.py`.
+
+## Project layout
+
+```
+Cache_MultiplicacionDeMatrices.cpp   cache-blocked matrix multiplication
+PThreads/                            Pthreads exercises + helper re-implementations, tarea.pdf
+oddevensort.c, mulmatrizvector.c     MPI programs
+tests/                               list, pi and MPI tests
+Makefile                             build/, `make test`, `make test-mpi`
+```
+
+## Known limitations
+
+- `mulmatrizvector` gave each process too small a block of A (scattered
+  `local_n + local_m` values into a `local_n·local_m` array, then read
+  `local_m·n` of it), so it read past its buffer and printed garbage. Fixed.
+- `oddevensort` called `MPI_Wtime` before `MPI_Init` and its (unused) `print`
+  lacked the rank argument; fixed. It leaves each process's block unsorted
+  after the last exchange, and it only prints timings.
+- `mulmatrizvector` needs `n = 100` to be divisible by the number of
+  processes.
+- `cache_matmul` and `pth_mat_vect_rand_split` only print timings and are
+  only run, not checked.
+
+## Background
+
+Written for a parallel algorithms course at university, 2018.
+
+## License
+
+MIT — see [LICENSE](../LICENSE).
