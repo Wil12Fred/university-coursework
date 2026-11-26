@@ -1,0 +1,11 @@
+# Compiled servlet classes (produced by build.sh)
+*.class
+build/
+*.war
+# Local environment
+.env
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
