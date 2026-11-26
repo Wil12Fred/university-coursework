@@ -14,5 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y freeglut3-dev
+      - run: sudo apt-get update && sudo apt-get install -y freeglut3-dev xvfb libgl1-mesa-dri
       - run: make
+      - name: Unit tests and a headless run under Xvfb
+        run: make test
