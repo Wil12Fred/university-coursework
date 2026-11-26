@@ -5,3 +5,4 @@ a.out
 *.dSYM/
 .idea/
 .vscode/
+/EuclidesExtendido/main
