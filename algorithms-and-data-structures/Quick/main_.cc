@@ -33,7 +33,7 @@ void quicksort(int* A,int n,int i,int j,int Ti){//0,n-1
   while (j>=inicio && A[j]>=pib)
     j--;
   quicksort(A,n,inicio,i-1,Ti*2-1);
-  while (A[i]==pib)
+  while (i<=fin && A[i]==pib)
     i++;
   if (i<fin)
     quicksort(A,n,i,fin,Ti*2);

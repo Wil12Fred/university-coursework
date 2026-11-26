@@ -35,7 +35,7 @@ inline void* quicksort(int* A,int n,int i,int j,int Ti){
   while (j>=inicio && A[j]>=pib)
     j--;
   T[Ti*2-1]=thread(quicksort,A,n,inicio,i-1,Ti*2-1);
-  while (A[i]==pib) i++;
+  while (i<=fin && A[i]==pib) i++;
   if (i<fin){
     T[Ti*2]=thread(quicksort,A,n,i,fin,Ti*2);
   }
