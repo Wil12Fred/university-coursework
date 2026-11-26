@@ -10,12 +10,18 @@ public class ConnectionManager {
         
   public static Connection getConnection() {
     
-    String url = "jdbc:mysql://localhost/jsplogin?useSSL=false";
+    // Connection settings come from the environment (see .env.example).
+    String url = env("DB_URL", "jdbc:mysql://localhost/jsplogin?useSSL=false");
     try {             
-      con = DriverManager.getConnection(url,"root","4puridiompe"); 
+      con = DriverManager.getConnection(url, env("DB_USER", "root"), env("DB_PASSWORD", "")); 
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
     return con;
+  }
+
+  private static String env(String name, String fallback) {
+    String value = System.getenv(name);
+    return value != null ? value : fallback;
   }
 }
