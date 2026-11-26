@@ -1,0 +1,3 @@
+x : int
+fun f(a : int) int
+end
