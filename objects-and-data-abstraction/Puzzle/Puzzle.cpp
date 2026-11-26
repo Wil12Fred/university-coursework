@@ -151,7 +151,7 @@ void Puzzle:: menu(){
 
   while ( win_lose() != 1 ){
 
-  cin >> op;
+  if (!(cin >> op)) break;  // stop on end of input instead of looping forever
   move_space(op,f,c);
   print_puzzle();
 
