@@ -3,7 +3,7 @@
 A small lexer and naive top-down parser, written in Python, for a toy
 imperative language in the style of "Mini-0" (keywords `fun`, `if`/`else`,
 `while ... loop`, `end`, typed declarations such as `x : int`). University
-compilers coursework (UCSP).
+compilers coursework.
 
 `anLx.py` does two things:
 
