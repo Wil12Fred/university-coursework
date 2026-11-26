@@ -10,14 +10,10 @@ defaults:
     working-directory: mini0-lexer-parser
 
 jobs:
-  run:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Valid program is accepted
-        run: python anLx.py examples/valid.txt | grep -q "Analisis sintactico correcto"
-      - name: Invalid program is rejected
-        run: python anLx.py examples/error.txt | grep -q "ERROR"
+      - uses: astral-sh/setup-uv@v5
+      - name: pytest (lexer, parser, golden programs, documented limits)
+        run: uv run --locked pytest -v
