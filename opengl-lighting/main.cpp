@@ -1,4 +1,8 @@
+#ifdef __APPLE__
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 #include "Camara.h"
 #include "primitivas.h"
 #include "Vector_tools.h"
