@@ -37,7 +37,7 @@ const int MAX_THREADS = 1024;
 
 long thread_count;
 long long n;
-int flag;
+volatile int flag;  /* volatile: at -O2 the busy-wait loop was hoisted and never ended */
 double sum;
 
 void* Thread_sum(void* rank);
