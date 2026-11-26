@@ -1,0 +1,23 @@
+name: automata-playground
+on:
+  push:
+    paths: ['automata-playground/**', '.github/workflows/automata-playground.yml']
+  pull_request:
+    paths: ['automata-playground/**', '.github/workflows/automata-playground.yml']
+
+defaults:
+  run:
+    working-directory: automata-playground
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Headless browser tests
+        run: npm test
