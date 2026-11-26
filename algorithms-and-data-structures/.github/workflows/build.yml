@@ -1,0 +1,18 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y libncurses-dev
+      - run: make -j4
+      - name: smoke-run the non-interactive programs
+        run: |
+          build/Tree-main
+          build/Heap-main
+          build/Quick-main_
+          build/Merge-main_
+          build/RedBlack-main
+          printf '1\n5\n3 1 4 1 5\n2\n3\n' | build/AVL-main
+          printf '2 3\n100\n001\n' | build/TareaProblema-problema
