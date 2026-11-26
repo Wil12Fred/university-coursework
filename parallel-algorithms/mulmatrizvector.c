@@ -71,8 +71,8 @@ int main(){
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   local_n = n/comm_sz; 
   local_m = m/comm_sz; 
-  double local_x[local_n],local_y[local_m],local_A[local_n*local_m];
-  Read_vector(local_A,local_n+local_m,n*m,"A",my_rank,MPI_COMM_WORLD);
+  double local_x[local_n],local_y[local_m],local_A[local_m*n];  // local_m full rows of A
+  Read_vector(local_A,local_m*n,n*m,"A",my_rank,MPI_COMM_WORLD);
   Read_vector(local_x,local_n,n,"X",my_rank,MPI_COMM_WORLD);
   Mat_vect_mult(local_A, local_x, local_y, local_m,n,local_n,MPI_COMM_WORLD);
 
