@@ -1,8 +1,14 @@
-name: build
+name: jsp-login-example
 
 on:
   push:
+    paths: ['jsp-login-example/**', '.github/workflows/jsp-login-example.yml']
   pull_request:
+    paths: ['jsp-login-example/**', '.github/workflows/jsp-login-example.yml']
+
+defaults:
+  run:
+    working-directory: jsp-login-example
 
 jobs:
   build:

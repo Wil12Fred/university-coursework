@@ -1,5 +1,14 @@
-name: build
-on: [push, pull_request]
+name: parallel-algorithms
+on:
+  push:
+    paths: ['parallel-algorithms/**', '.github/workflows/parallel-algorithms.yml']
+  pull_request:
+    paths: ['parallel-algorithms/**', '.github/workflows/parallel-algorithms.yml']
+
+defaults:
+  run:
+    working-directory: parallel-algorithms
+
 jobs:
   build:
     runs-on: ubuntu-latest

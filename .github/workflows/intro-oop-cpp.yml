@@ -1,0 +1,20 @@
+name: intro-oop-cpp
+on:
+  push:
+    paths: ['intro-oop-cpp/**', '.github/workflows/intro-oop-cpp.yml']
+  pull_request:
+    paths: ['intro-oop-cpp/**', '.github/workflows/intro-oop-cpp.yml']
+
+defaults:
+  run:
+    working-directory: intro-oop-cpp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make
+      - run: |
+          echo "5 3 1 4 1 5" | build/lista
+          echo 4 | build/abeja

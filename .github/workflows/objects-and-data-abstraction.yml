@@ -1,0 +1,19 @@
+name: objects-and-data-abstraction
+on:
+  push:
+    paths: ['objects-and-data-abstraction/**', '.github/workflows/objects-and-data-abstraction.yml']
+  pull_request:
+    paths: ['objects-and-data-abstraction/**', '.github/workflows/objects-and-data-abstraction.yml']
+
+defaults:
+  run:
+    working-directory: objects-and-data-abstraction
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y libncurses-dev
+      - run: make
+      - run: printf 'w\nd\n' | build/puzzle

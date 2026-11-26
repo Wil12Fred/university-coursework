@@ -1,5 +1,14 @@
-name: build
-on: [push, pull_request]
+name: mini0-lexer-parser
+on:
+  push:
+    paths: ['mini0-lexer-parser/**', '.github/workflows/mini0-lexer-parser.yml']
+  pull_request:
+    paths: ['mini0-lexer-parser/**', '.github/workflows/mini0-lexer-parser.yml']
+
+defaults:
+  run:
+    working-directory: mini0-lexer-parser
+
 jobs:
   run:
     runs-on: ubuntu-latest

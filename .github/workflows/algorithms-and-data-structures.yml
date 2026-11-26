@@ -1,5 +1,14 @@
-name: build
-on: [push, pull_request]
+name: algorithms-and-data-structures
+on:
+  push:
+    paths: ['algorithms-and-data-structures/**', '.github/workflows/algorithms-and-data-structures.yml']
+  pull_request:
+    paths: ['algorithms-and-data-structures/**', '.github/workflows/algorithms-and-data-structures.yml']
+
+defaults:
+  run:
+    working-directory: algorithms-and-data-structures
+
 jobs:
   build:
     runs-on: ubuntu-latest

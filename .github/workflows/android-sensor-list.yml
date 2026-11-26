@@ -1,8 +1,14 @@
-name: build
+name: android-sensor-list
 
 on:
   push:
+    paths: ['android-sensor-list/**', '.github/workflows/android-sensor-list.yml']
   pull_request:
+    paths: ['android-sensor-list/**', '.github/workflows/android-sensor-list.yml']
+
+defaults:
+  run:
+    working-directory: android-sensor-list
 
 jobs:
   build:

@@ -1,8 +1,14 @@
-name: build
+name: android-face-tracker
 
 on:
   push:
+    paths: ['android-face-tracker/**', '.github/workflows/android-face-tracker.yml']
   pull_request:
+    paths: ['android-face-tracker/**', '.github/workflows/android-face-tracker.yml']
+
+defaults:
+  run:
+    working-directory: android-face-tracker
 
 jobs:
   build:
