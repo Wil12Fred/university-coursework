@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns = "http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv = "Content-Type" content = "text/html; charset=iso-8859-1" />
+		<title> Expresiones </title>
+		<script type = "text/javascript">			
+			var entradas = ["0", "1"];
+			var p = ["p", "q"];
+			var q = ["r", "p"];
+			var r = ["q", "r"];
+			
+			var estados = [p, q, r];
+			var indice_de_estados = ["p", "q", "r"];
+			
+			var estado_inicial = "p";
+			var estado_de_aceptacion = "p";
+			
+			var estado_actual = estado_inicial;
+			
+			var cadena = "11";
+			
+			var derivarcion_total = "";
+			var mostrar = "";
+		</script>
+	</head>
+	 
+	<body>
+		<script type = "text/javascript"> 
+			for(i = 0; i < cadena.length; i++)
+			{
+				var indice_entrada_actual = entradas.indexOf(cadena[i]);
+				derivarcion_total += entradas[indice_entrada_actual];
+				
+				mostrar = derivarcion_total;
+				
+				var copia_estado_actual = estados[indice_de_estados.indexOf(estado_actual)];
+				mostrar += copia_estado_actual[indice_entrada_actual];
+				
+				estado_actual = mostrar[mostrar.length - 1];
+				
+				document.writeln(mostrar);
+				document.writeln("<br>");
+			}
+			
+			if(mostrar[mostrar.length - 1] == estado_de_aceptacion)
+			{document.writeln("SI");}
+			
+			else
+			{document.writeln("NO");}
+		</script> 
+	</body>
+</html>

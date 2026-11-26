@@ -1,0 +1,112 @@
+<script type = "text/javascript">
+	function TablaAutomata()
+	{
+		var contenedor = document.getElementById("tabla_automatas");
+		var filas = document.getElementById('estados').value;
+		var columnas = document.getElementById('entradas').value;
+		
+		var alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		var codigo = "<table border = 1><tr> <td rowspan = '2'></td> <td colspan = '" + columnas + "'><p align = 'center'> Entradas </p></td> </tr>";
+		
+		codigo += "<tr>";
+		
+		for(var i = 0; i < columnas; i++)
+			codigo += "<td><input type = 'text' id = 'e" + i + "' value = '" + i + "' size = '3'></td>";
+		
+		codigo += "</tr>";
+
+		for(var i = 0; i < filas; i++)
+		{
+			codigo += "<tr><td><p align = 'center'> q" + i + " (" + alfabeto[i] + ") </p></td>";
+			
+			for(var j = 0; j < columnas; j++)
+				codigo += "<td><input type = 'text' id = 'q" + i + "-" + j + "' size = '3'></td>";
+			
+			codigo += "</tr>";
+		}
+		
+		codigo += "</table><br>";
+		codigo += " * q0 es el estado inicial por defecto. <br>";
+		codigo += "Estado de aceptacion: <input type = 'text' id = 'estado_aceptacion'><br>";
+		codigo += "Cadena: <input type = 'text' id = 'cadena_entrada'><br>";
+		codigo += "<input type = 'button' value = 'Derivar cadena' onClick = 'ExpresionesLibres();'>";
+		
+		contenedor.innerHTML = codigo;   
+	}
+	
+	function ExpresionesLibres()
+	{
+		var contenedor = document.getElementById("expresiones_libres");
+		var filas = document.getElementById('estados').value;
+		var columnas = document.getElementById('entradas').value;
+		
+		var alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		var id_entrada = ""; var id_celda = "";
+		var dato_entrada; var dato_celda;
+		
+		//CREANDO MATRIZ
+			var matriz =  new Array(filas);
+			for(var i = 0; i < filas; i++) matriz[i] = new Array(columnas);
+			
+		//INDICE DE ENTRADAS
+			var indice_entradas = "";
+
+		//AGREGANDO LAS ENTRADAS AL INDICE
+			for(var i = 0; i < columnas; i++)
+			{
+				id_entrada = "e" + i;
+				dato_entrada = document.getElementById(id_entrada).value;
+				
+				indice_entradas += dato_entrada;
+			}
+		
+		//RELLENANDO LA MATRIZ DE ARISTAS
+			for(var i = 0; i < filas; i++)
+			{			
+				for(var j = 0; j < columnas; j++)
+				{				
+					id_celda = "q" + i + "-" + j;
+					dato_celda = document.getElementById(id_celda).value;
+					
+					matriz[i][j] = dato_celda;
+				}
+			}
+		
+		//DERIVANDO LA CADENA
+			var codigo = "A <br>";
+		
+			var estado_aceptacion = document.getElementById("estado_aceptacion").value;
+			var cadena = document.getElementById("cadena_entrada").value;
+			var cadena_derivada = "A";
+			
+			for(var i = 0; i < cadena.length; i++)
+			{	
+				var entrada_actual = indice_entradas.indexOf(cadena[i]);
+				var estado_actual = alfabeto.indexOf(cadena_derivada[cadena_derivada.length - 1]);
+				
+				cadena_derivada = cadena_derivada.substring(0, cadena_derivada.length - 1); //ELIMINANDO EL ULTIMO CARACTER
+				cadena_derivada += cadena[i] + matriz[estado_actual][entrada_actual];
+				
+				codigo += cadena_derivada;
+				codigo += "<br>";
+			}
+			
+			//VERIFICANDO SI SE LLEGO AL ESTADO DE ACEPTACION
+				if(cadena_derivada[cadena_derivada.length - 1] == estado_aceptacion)
+					codigo += cadena + "<br><br> Verdadero.";
+					
+				else codigo += "<br> Falso.";
+			
+		contenedor.innerHTML = codigo;
+	}
+</script>
+	
+<body>
+	Numero de entradas: <input type = "text" id = "entradas"><br>
+	Numero de estados: <input type = "text" id = "estados"><br>
+	<input type = "button" value = "Crear tabla" onClick = "TablaAutomata();">
+	
+	<div id = "tabla_automatas"></div>
+	<div id = "expresiones_libres"></div>
+	
+</body>
