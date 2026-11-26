@@ -78,8 +78,9 @@ make test
   - `Light`: moving in longitude keeps the light on its sphere, moving
     closer/farther changes the distance by exactly the step along the same
     direction, and never below 0.8.
-- The smoke run starts `./iluminacion` (under `xvfb-run` when there is no
-  display) and passes if the window is still open after 5 s.
+- The smoke run starts `./iluminacion` on a private virtual display
+  (`xvfb-run -a`, never your own `DISPLAY`) and passes if the window is still
+  open after 5 s.
 
 ## Project layout
 
