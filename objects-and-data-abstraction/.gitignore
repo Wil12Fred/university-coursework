@@ -1,0 +1,8 @@
+build/
+*.o
+a.out
+.DS_Store
+*.dSYM/
+.idea/
+.vscode/
+/EuclidesExtendido/main
