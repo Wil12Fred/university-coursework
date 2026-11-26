@@ -681,7 +681,7 @@ function AEF() {
 	var col = document.getElementById('estados').value;
 	var fil = document.getElementById('entradas').value;
 	var alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	for (var i = 0; i < fil; i++){
+	for (var i = 0; i < col; i++){ // one node per state (col holds the number of states)
 		addNode(i, alfabeto[i]);
 	}
 	cont=0;

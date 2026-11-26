@@ -1,0 +1,13 @@
+{
+  "name": "automata-playground",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static page for finite automata: derivations, graphs, Moore machines and regular expressions",
+  "license": "MIT",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}
