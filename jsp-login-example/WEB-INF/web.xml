@@ -8,7 +8,7 @@
  
    <servlet>
       <servlet-name>UserQuery</servlet-name>
-      <servlet-class>QueryServlet</servlet-class>
+      <servlet-class>myPackage.QueryServlet</servlet-class>
    </servlet>
  
    <!-- Note: All <servlet> elements MUST be grouped together and

@@ -23,7 +23,7 @@ public class QueryServlet extends HttpServlet {
            session.setAttribute("currentSessionUser",user); 
            response.sendRedirect("userLogged.jsp");
       } else 
-           response.sendRedirect("invalidLogin.jsp")
+           response.sendRedirect("invalidLogin.jsp");
     } catch (Throwable theException) {
      System.out.println(theException); 
     }

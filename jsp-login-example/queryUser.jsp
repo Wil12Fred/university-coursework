@@ -9,7 +9,7 @@
   <title>Ingrese el Usuario</title>
 </head>
 <body>
-  <form method="get" action="http://localhost:9999/hello/query">
+  <form method="get" action="query">
       Username
       <input type="text" name="un"/><br>    
 
