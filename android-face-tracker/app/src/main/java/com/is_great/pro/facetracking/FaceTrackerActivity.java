@@ -225,23 +225,13 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             float y = mFaceGraphic.translateY(face.getPosition().y + face.getHeight() / 2);
             float xOffset = mFaceGraphic.scaleX(face.getWidth() / 2.0f);
             float yOffset = mFaceGraphic.scaleY(face.getHeight() / 2.0f);
-            int left = (int)(x - xOffset);
-            if (left < 0 ){
-                left = 0;
+            int[] crop = cropRect(x, y, xOffset, yOffset, image.getWidth(), image.getHeight());
+            if (crop == null) {  // the face box lies outside the overlay: nothing to save
+                mOverlay.add(mFaceGraphic);
+                mFaceGraphic.updateFace(face);
+                return;
             }
-            int top = (int) (y - yOffset);
-            if (top < 0) {
-                top = 0;
-            }
-            int right = (int) (x + xOffset);
-            if (right > image.getWidth()){
-                right = image.getWidth();
-            }
-            int bottom = (int) (y + yOffset);
-            if (bottom > image.getHeight()){
-                bottom = image.getHeight();
-            }
-            Bitmap croppedBitmap = Bitmap.createBitmap(image, left, top, right-left, bottom-top);
+            Bitmap croppedBitmap = Bitmap.createBitmap(image, crop[0], crop[1], crop[2], crop[3]);
             String filename = "face" + token + "-" + face.getId()+".png";
             if (!fileExists(getApplicationContext(), filename)) {
                 File file = getApplicationContext().getFileStreamPath(filename);
@@ -270,6 +260,23 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
         }
+    }
+
+    /**
+     * The face box centred at (x, y) with half-sizes (xOffset, yOffset), clipped
+     * to a width x height image, as {left, top, width, height}; null when
+     * nothing of it is inside the image (Bitmap.createBitmap rejects an empty
+     * or negative size).
+     */
+    static int[] cropRect(float x, float y, float xOffset, float yOffset, int width, int height) {
+        int left = Math.max(0, (int) (x - xOffset));
+        int top = Math.max(0, (int) (y - yOffset));
+        int right = Math.min(width, (int) (x + xOffset));
+        int bottom = Math.min(height, (int) (y + yOffset));
+        if (right <= left || bottom <= top) {
+            return null;
+        }
+        return new int[] {left, top, right - left, bottom - top};
     }
 
     public static Bitmap loadBitmapFromView(View v, int width, int height) {
