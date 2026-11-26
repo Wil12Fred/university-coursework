@@ -1,0 +1,19 @@
+name: computer-architecture-mips
+on:
+  push:
+    paths: ['computer-architecture-mips/**', '.github/workflows/computer-architecture-mips.yml']
+  pull_request:
+    paths: ['computer-architecture-mips/**', '.github/workflows/computer-architecture-mips.yml']
+
+defaults:
+  run:
+    working-directory: computer-architecture-mips
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y spim
+      - name: Golden tests under SPIM
+        run: make test
