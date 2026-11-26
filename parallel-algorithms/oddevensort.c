@@ -18,7 +18,7 @@ void init(int* data, int rank) {
 /* print the data to the screen */
 void print(int* data, int rank) {
   int i;
-  printf("Process %d: ");
+  printf("Process %d: ", rank);
   for (i = 0; i < N; i++) {
     printf("%d ", data[i]);
   }
@@ -156,17 +156,17 @@ void parallel_sort(int* data, int rank, int size) {
   }
 }
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
   /* our rank and size */
   int rank, size;
   double MPI_Wtime(void);
   double start,finish;
-  start=MPI_Wtime(); 	
   /* our processes data */
   int data[N];
 
   /* initialize MPI */
   MPI_Init(&argc, &argv);
+  start=MPI_Wtime();  /* MPI_Wtime is only valid after MPI_Init */
 
   /* get the rank (process id) and size (number of processes) */
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
